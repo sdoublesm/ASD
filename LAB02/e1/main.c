@@ -5,7 +5,6 @@ int gcd(int a, int b){
     if(a<b){
         tmp = a;  a = b; b = tmp;
     }   
-
     // condizione di terminazione
     if(b==0)
         return a;
