@@ -1,5 +1,7 @@
 # include <stdio.h>
 
+// Esercizio 1: Ricerca ricorsiva massimo comun divisore
+
 int gcd(int a, int b){
     int tmp;
     if(a<b){

@@ -2,6 +2,8 @@
 #include <string.h>
 #include <ctype.h>
 
+// Esercizio n. 2 - Azienda di trasporti
+
 typedef enum {
     r_date, r_partenza, r_capolinea, r_ritardo, r_ritardotot, r_fine
 } comando_e;
@@ -108,7 +110,7 @@ void ritardo_tot(tratta tratte[], int dim){
     printf("Tratta: %s\nRitardo totale: %d minuti\n", codice, ritardo);
 }
 
- comando_e leggiComando(){
+comando_e leggiComando(){
     comando_e cmd;
     char parola[30], cmdlist[r_fine+1][30]={"date", "partenza", "capolinea", "ritardo", "ritardotot", "fine"};
     printf("> Inserisci un comando: ");
@@ -125,6 +127,7 @@ void menu(tratta tratte[], int dim){
     int continua=-1;
     
     while(continua){
+        printf("\n----------------------\n");
         printf("\nMENU OPZIONI ---------\n");
         printf("1. date\n2. partenza\n3. capolinea\n4. ritardo\n5. ritardotot\n6. fine\n");
         printf("----------------------\n");

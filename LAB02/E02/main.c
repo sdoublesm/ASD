@@ -4,8 +4,7 @@
 // Esercizio 2: Allocazione di matrici
 
 int **malloc2dR(int nr, int nc){
-    int **m;
-    int i;
+    int **m, i;
     m = malloc(nr*sizeof(int *));
     for(i=0; i<nr; i++){
         m[i] = malloc(nc*sizeof(int));
