@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Esercizio n. 1: Ricerca ricorsiva dell'elemento maggioritario
+
 int counter(int *a, int val, int l, int r) {
     int c = 0;
     for (int i = l; i <= r; i++) {
