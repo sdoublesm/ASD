@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define MAXCHARS 256
+#define MAXCHARS 255
 #define FILENAME "brani.txt"
 
 // Esercizio n. 2: Playlist
-// Utilizzo del principio di moltiplicazione
+// Applicazione del principio di moltiplicazione
 
 typedef struct{
     char **scelte;
@@ -32,7 +32,7 @@ int main(void){
     Livello *val; 
     char **sol; 
     int pos=0, count=0, nf, i, j;
-    FILE *fp_read=fopen("brani.txt", "r");
+    FILE *fp_read=fopen(FILENAME, "r");
 
     if(fp_read==NULL){
         printf("[!] Errore durante l'apertura del file");
@@ -42,7 +42,7 @@ int main(void){
     fscanf(fp_read, "%d", &nf);
 
     // Allocazione dinamica strutture dati
-    val = malloc(nf*sizeof(Livello)); // vettore di struct Livello di dimensione n che contiene TUTTE le SCELTE
+    val = malloc(nf*sizeof(Livello)); // vettore di struct Livello di dimensione nf che contiene TUTTE le SCELTE
     // ogni struct contiene un numero di scelte per quel livello
     sol = malloc(nf*sizeof(char*)); // vettore di stringhe che contiene una soluzione
     for(i=0; i<nf; i++){
