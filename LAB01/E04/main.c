@@ -261,7 +261,7 @@ void menu(tratta **tratte, int dim){
 }
 
 int main(void){
-    int n, h_p, h_a, mi_p, mi_a, s_p, s_a, d, y, mo, i;
+    int n, i, y, mo, d;
     FILE *fp_read=fopen("log.txt", "r");
 
     if(fp_read==NULL){
