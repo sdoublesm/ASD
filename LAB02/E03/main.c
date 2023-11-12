@@ -69,7 +69,7 @@ void leggiFile(){
     fscanf(fp_read, "%d\n", &n);
 
     tratte = malloc(n*sizeof(tratta));
-    ptotratte = malloc(n*sizeof(*tratte));
+    ptotratte = malloc(n*sizeof(tratta *));
 
     for(i=0; i<n; i++){
         fscanf(fp_read, "%s %s %s %d/%d/%d %s %s %d\n", 
@@ -271,8 +271,8 @@ void menu(tratta *vtratte, tratta **tratte, int dim){
         cmd = leggiComando();
         switch(cmd){
             case c_leggiFile:
-                free(vtratte);
                 free(tratte);
+                free(vtratte);
                 printf("Vettori precedenti deallocati.\n");
                 leggiFile();
                 break;
