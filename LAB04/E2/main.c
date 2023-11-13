@@ -9,7 +9,7 @@
 // di nascita (le persone più giovani appaiono prima nella lista)
 
 // ogni nodo della lista è una struct con dati racchiusi in un campo val di tipo Item
-// uno o due riferimenti (“link”) che puntano al nodo successivo e/o precedente
+// e uno o due riferimenti (“link”) che puntano al nodo successivo e/o precedente
 typedef struct {
     char codice[MAXC];
     char nome[MAXC];
@@ -29,10 +29,8 @@ struct node{
 };
 
 typedef enum {
-    c_print, c_insTastiera, c_insFile, c_delCodice, c_delDate, c_printFile, c_exit
+    c_print, c_insTastiera, c_insFile, c_searchByCode, c_delCodice, c_delDate, c_printFile, c_exit
 } comando_e;
-
-// void menu(link head);
 
 // ---------------------------------------------------------------------------
 // Funzioni gestione lista
@@ -57,7 +55,7 @@ link listInsHead(link h, Item val){
 }
 
 // INSERZIONE IN CODA (algoritmo meno complesso)
-void listInsT(link *hp, link *tp, Item val){
+void listInsCoda(link *hp, link *tp, Item val){
     if(*hp = NULL)
         *hp = *tp = newNode(val, NULL);
     else
@@ -81,9 +79,6 @@ link SortListIns(link h, Item val){
     return h;
 }
 
-// ---------------------------------------------------------------------------
-// Funzioni menu
-
 void printList(link h){
     link w = h;
     printf("Contenuto della lista:\n");
@@ -94,7 +89,6 @@ void printList(link h){
     }
     printf("--------------------------\n");
 }
-
 
 // [!] si assume che l'utente inserisca correttamente i dati
 link insTastiera(link h){
@@ -111,6 +105,24 @@ link insTastiera(link h){
     return h;
 }
 
+link insFile(link h, char *filename){
+    FILE *fp_read = fopen(filename, "r");
+    int d, m, y;
+    Item persona;
+    if(fp_read==NULL){
+        printf("Errore durante l'apertura del file.");
+        return h;
+    }
+    while(!feof(fp_read)){
+        fscanf(fp_read, "%s %s %s %d/%d/%d %s %s %d\n", 
+        persona.codice, persona.nome, persona.cognome, &d, &m, &y, persona.via, persona.citta, &(persona.cap));
+        persona.datanascita = y*10000+m*100+d;
+        h = SortListIns(h, persona);
+    }
+    fclose(fp_read);
+    return h;   
+}
+
 void printListOnFile(link h){
     FILE *fp_write = fopen("list.txt", "w");
     link w = h;
@@ -123,6 +135,60 @@ void printListOnFile(link h){
     fclose(fp_write);
 }
 
+// Il codice e' univoco, ci sara' al massimo solo un risultato
+void searchByCode(link h, char code[MAXC]){
+    link x;
+    printf("Risultato della ricerca:\n");
+    for(x=h; x!=NULL && strcmp(x->val.codice, code)!=0; x=x->next);
+    if(x==NULL){
+        printf("Nessun risultato.\n");
+        return;        
+    }
+    printf("----- [%s] %s %s\nData di nascita: %d\nIndirizzo: %s\nCitta: %s, CAP: %d\n", 
+    x->val.codice, x->val.nome, x->val.cognome, x->val.datanascita, x->val.via, x->val.citta, x->val.cap);   
+}
+
+link delCodice(link h, char code[MAXC]){
+    link x=h, p;
+    if(h==NULL){
+        printf("La lista e' vuota.\n");
+        return h;
+    }
+    for(x=h, p=NULL; x!=NULL && strcmp(x->val.codice, code)!=0; p=x, x=x->next);
+    if(x==NULL || strcmp(x->val.codice, code)!=0){ // arriva alla fine senza trovare l'elemento
+        printf("Impossibile trovare l'elemento.\n");
+        return h;
+    }
+    if(strcmp(x->val.codice, code)==0){
+        if(x==h){ // se l'elemento trovato e' il primo
+            h = h->next; // la lista inizia dal secondo elmeento
+        } 
+        else{
+            p->next = x->next;
+            free(x);
+        }
+        printf("Elemento eliminato con successo.\n");
+    }
+    return h;
+}
+
+link delDate(link h, int d1, int d2){
+    link x=h, p;
+    if(h==NULL){
+        printf("La lista e' vuota.\n");
+        return NULL;
+    }
+    for(x=h, p=NULL; x!=NULL && (x->val.datanascita<d1 || x->val.datanascita>d2); p=x, x=x->next);
+    if(x==NULL){ // arriva alla fine senza trovare l'elemento
+        // printf("[delDate] Nessun elemento da eliminare.\n");
+        return NULL;
+    }    
+    return x;
+}
+
+// ---------------------------------------------------------------------------
+// Funzioni gestione menu
+
 char * strtolower(char s[]){
     for(int i=0;s[i]!='\0';i++){
         s[i]=tolower(s[i]);
@@ -130,12 +196,9 @@ char * strtolower(char s[]){
     return s;
 }
 
-// ---------------------------------------------------------------------------
-// Funzioni gestione menu
-
 comando_e leggiComando(){
     comando_e cmd;
-    char parola[MAXC], cmdlist[c_exit+1][30]={"print", "insTastiera", "insFile", "delCodice", "delDate", "printFile", "exit"};
+    char parola[MAXC], cmdlist[c_exit+1][30]={"print", "insTastiera", "insFile", "searchByCode", "delCodice", "delDate", "printFile", "exit"};
     printf("> Inserisci il nome di un comando: ");
     scanf("%s", parola); 
     getchar(); // scanf lascia \n nel buffer!!!
@@ -148,13 +211,14 @@ comando_e leggiComando(){
 
 void menu(link h){
     comando_e cmd;
-    int continua = 1;
-    char strtosearch[MAXC];
+    link r;
+    int continua = 1, d1, d2;
+    char code[MAXC], filename[MAXC];
 
     while(continua==1){  
         printf("\n----------------------\n");
         printf("MENU OPZIONI ---------\n");
-        printf("0. print\n1. insTastiera\n2. insFile\n3. delCodice\n4. delDate\n5. printFile\n6. exit\n");
+        printf("0. print\n1. insTastiera\n2. insFile\n3. searchByCode\n4. delCodice\n5. delDate\n6. printFile\n7. exit\n");
         printf("----------------------\n");
         cmd = leggiComando();
         switch(cmd){
@@ -165,10 +229,34 @@ void menu(link h){
                 h = insTastiera(h);
                 break;
             case c_insFile:
+                printf("Inserisci il nome del file da cui caricare i dati: ");
+                scanf("%s", filename); getchar();
+                h = insFile(h, filename);
+                printf("Lista caricata correttamente dal file '%s'", filename);
+                break;
+            case c_searchByCode:
+                printf("Inserisci il codice da cercare: "); 
+                scanf("%s", code); getchar();
+                searchByCode(h, code);
                 break;
             case c_delCodice:
+                printf("Inserisci il codice dell'elemento da eliminare: "); 
+                scanf("%s", code); getchar();
+                h = delCodice(h, code);
                 break;
             case c_delDate:
+                printf("Eliminazione di elementi con data di nascita compresa tra d1 e d2\nInserisci d1 nel formato yyyymmdd: ");
+                scanf("%d", &d1); getchar();
+                printf("Inserisci d2 nel formato yyyymmdd: ");
+                scanf("%d", &d2); getchar();
+                r = delDate(h, d1, d2);
+                if(r==NULL)
+                    printf("Nessun risultato.\n");
+                while(r!=NULL){
+                    printf("Eliminazione dell'elemento con codice %s...\n", r->val.codice);
+                    h = delCodice(h, r->val.codice);
+                    r = delDate(h, d1, d2);
+                }
                 break;
             case c_printFile:
                 printListOnFile(h);
@@ -185,33 +273,11 @@ void menu(link h){
 }
 
 // ---------------------------------------------------------------------------
-// MAIN
 
 int main(void){
-    FILE *fp_read = fopen("anag1.txt", "r");
-    int d, m, y;
-    Item persona;
-
     link head = NULL;
-
-    // inizializzare lista vuota
-    // acquisizione ed inserimento ordinato di un nuovo elemento in lista da tastiera e da file
-    // ricerca per codice di un elemento
-    // cancellazione con estrazione di un elemento dalla lista previa ricerca per codice
-    if(fp_read==NULL){
-        printf("Errore durante l'apertura del file.");
-        return -1;
-    }
-    while(!feof(fp_read)){
-        fscanf(fp_read, "%s %s %s %d/%d/%d %s %s %d\n", 
-        persona.codice, persona.nome, persona.cognome, &d, &m, &y, persona.via, persona.citta, &(persona.cap));
-        persona.datanascita = y*10000+m*100+d;
-        head = SortListIns(head, persona);
-    }
-
-    menu(head);
-    
-    fclose(fp_read);
-    
+    head = insFile(head, "anag1.txt");
+    printf("Lista caricata correttamente.");
+    menu(head);    
     return 0;
 }

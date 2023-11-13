@@ -1,12 +1,16 @@
------ [A0003] - Antonio Neri
+----- [A0003] Antonio Neri
 Data di nascita: 19990419
 Indirizzo: GalleriaTermini
 Citta: Roma, CAP: 185
------ [A0001] - Mario Rossi
+----- [A0004] Anna Gialli
+Data di nascita: 19950904
+Indirizzo: FratelliAlinari
+Citta: Firenze, CAP: 50123
+----- [A0001] Mario Rossi
 Data di nascita: 19900201
 Indirizzo: ViaMarcoPolo
 Citta: Torino, CAP: 10129
------ [A0002] - Lucia Verdi
+----- [A0002] Lucia Verdi
 Data di nascita: 19891107
 Indirizzo: ViaTorino
 Citta: Milano, CAP: 20123
