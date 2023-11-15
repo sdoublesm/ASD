@@ -172,6 +172,9 @@ link delCodice(link h, char code[MAXC]){
     return h;
 }
 
+// [!] restituisce solo il puntatore al nodo ricercato 
+// l'effettiva eliminazione iterativa viene gestita dal chiamante
+// che sfrutta delCodice per eliminare uno alla volta i nodi
 link delDate(link h, int d1, int d2){
     link x=h, p;
     if(h==NULL){
