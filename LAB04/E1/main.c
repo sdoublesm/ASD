@@ -12,6 +12,7 @@
 // idea di base: generare l'insieme delle parti dell'insieme dei vertici del grafo
 // aggiungere verifica che essi siano vertex cover e, nel caso, stamparli.
 
+// verifica di accettabilita'
 int check(int pos, int *sol, int **a, int E) {
     int covered;
     
@@ -37,8 +38,7 @@ int check(int pos, int *sol, int **a, int E) {
 }
 
 // funzione che sfrutta il paradigma 'divide et impera' operando ricorsivamente
-// poco intuitivo
-// RISCRIVERE CON DISPOSIZIONI RIPETUTE 
+// anche se poco intuitivo rispetto alla versione con le disposizioni
 int powerset(int pos, int *val, int *sol, int n, int start, int count, int **archi, int E) {
    int i;
    // terminazione -> non ci sono piu elementi
