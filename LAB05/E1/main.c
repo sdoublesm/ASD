@@ -7,6 +7,8 @@ typedef struct {
     int d;
 } att;
 
+// Esercizio n. 1: Sequenza di attivita'
+
 // esegue il check sul vettore soluzione
 // confrontando ogni elemento del vettore sol con quelli di val
 int check(int n, att *val, int *sol, int pos) {
@@ -19,6 +21,8 @@ int check(int n, att *val, int *sol, int pos) {
 
 // conviene utilizzare modello con dispozizioni ripetute
 // e' piu facile manipolare il vettore sol con soli 0 e 1
+// per ottenere poi al termine dell'algoritmo ricorsivo
+// il vettore di soluzioni cercato
 // -> invece che stampare ogni soluzione, la funzione 
 // determina di volta in volta se le attivita' della soluzione
 // corrente hanno somma della durata massima
