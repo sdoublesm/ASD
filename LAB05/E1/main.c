@@ -26,7 +26,7 @@ int check(int n, att *val, int *sol, int pos) {
 // -> invece che stampare ogni soluzione, la funzione 
 // determina di volta in volta se le attivita' della soluzione
 // corrente hanno somma della durata massima
-// [!] ERRORE: solo max deve essere passato by reference!
+// ! ERRORE: solo max deve essere passato by reference!
 int powerset(int pos, att *val, int *sol, int n, int cnt, int *solCompl, int sum, int *max) {
     int i;
     if (pos >= n) {
@@ -70,7 +70,7 @@ int attSel(att *v, int n){
 int main(void){
     att *attivita;
     int i, n;
-    FILE *fp_read = fopen("att1.txt", "r");
+    FILE *fp_read = fopen("att.txt", "r");
     if(fp_read==NULL){
         printf("Errore durante l'apertura del file.");
         return -1;

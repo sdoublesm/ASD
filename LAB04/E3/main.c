@@ -86,7 +86,6 @@ int disp_rip(int pos, int *npietre, pietra *sol, int n, int k, pietra *bestsol) 
     return 0;
 }
 
-
 int main() {
     int i, k, n = 4, bestk = 0, maxk = 0;
     pietra *sol, *bestsol;
