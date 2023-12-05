@@ -7,7 +7,8 @@ typedef struct {
     int d;
 } att;
 
-/*
+
+/*  Esercizio n. 1: Sequenza di attivita' (Versione 2)
 ? Problema: Trovare un sottoinsieme di attivita' compatibili  
 ? che massimizzi la somma delle durate utilizzando la programmazione dinamica
 
@@ -43,6 +44,7 @@ int max(int a, int b){
 
 // ---------------------------------------------
 
+// stampa ricorsiva
 void aSDPrint(att *a, int *P, int i) {
     if (P[i]==-1) {
         printf("(%d, %d) ", a[i].s, a[i].f);
@@ -70,7 +72,9 @@ void sortAtt(att* a, int n){
 }
 
 /*
-Passi:
+* La soluzione con programmazione dinamica trasforma quella ricorsiva in iterativa
+
+- Passi:
 * Il valore minimo di una sequenza è 1
 * + per lunghezze crescenti del sottovettore considerato si individua 
 * la sequenza che soddisfa le condizioni
@@ -93,9 +97,11 @@ void attSelDynamic(att *a, int n) {
     sum[0] = a[0].d;
     prev[0] = -1;
 
+    // scorre le attivita 
     for (i = 1; i < n; i++) {
         sum[i] = a[i].d; // inizializza con durata dell'attivita corretne
         prev[i] = -1; // -1 indica nessuna attività precedente
+        // scorre le attivita precedenti ad i per confrontarle con essa
         for (j = 0; j < i; j++) {
             if (a[i].s >= a[j].f || a[j].s >= a[i].f) {
                 // se le attività i e j sono compatibili, calcola la somma massima
@@ -115,7 +121,6 @@ void attSelDynamic(att *a, int n) {
         printf("(%d, %d) ", a[last].s, a[last].f);
         last = prev[last];
     }
-
     free(sum);
     free(prev);
 }
