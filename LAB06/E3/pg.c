@@ -46,7 +46,7 @@ void listInsCoda(link *hp, link *tp, PG val){
 link searchByCode(link h){
     link x;
     char code[7];
-    printf("Inserisci il codice di 6 caratteri da cercare:\n");
+    printf("Inserisci il codice di 6 caratteri del personaggio da cercare:\n");
     scanf("%s", code); getchar();
     printf("Risultato della ricerca:\n");
     for(x=h; x!=NULL && strcmp(x->val.code, code)!=0; x=x->next);
@@ -65,47 +65,53 @@ link searchByCode(link h){
 
 // funzione stampa equipaggiamento
 
-PG *addObj(PG *personaggio, tabObj *inv){
+PG *addObj(tabPG *tabPers, tabObj *inv){
     char objname[50];
     obj *object;
+    link pgnode;
+    pgnode=searchByCode(tabPers->headPG);
+    if(pgnode==NULL)
+        return NULL;
     printf("AGGIUNTA DI UN ELEMENTO ALL'EQUIPAGGIAMENTO\n");
-    if(personaggio->equip->using >= 8){
-        printf("L'equipaggiamento del personaggio %s e' al completo.", personaggio->code);
+    if(pgnode->val.equip->using >= 8){
+        printf("L'equipaggiamento del personaggio %s e' al completo.", pgnode->val.code);
         return NULL;
     }
     printf("Inserisci il nome dell'oggetto che vuoi inserire nell'equipaggiamento: ");
     scanf("%s", objname); getchar();
     object = searchObj(inv, objname);
     if(object!=NULL){
-        personaggio->equip->vettEq[personaggio->equip->using] = object;
-        personaggio->equip->using+=1;
+        pgnode->val.equip->vettEq[pgnode->val.equip->using] = object;
+        pgnode->val.equip->using+=1;
 
-        printf("%s aggiunto correttamente all'equipaggiamento del personaggio %s.\n", object->name, personaggio->code);
+        printf("%s aggiunto correttamente all'equipaggiamento del personaggio %s.\n", object->name, pgnode->val.code);
     }
-    return personaggio;
+    return &(pgnode->val);
 }
 
-
-// ! NON FUNZIONA REMOVE
-PG *removeObj(PG *personaggio) {
+PG *removeObj(tabPG *tabPers) {
     char objname[50];
+    link pgnode;
+    pgnode=searchByCode(tabPers->headPG);
+    if(pgnode==NULL)
+        return NULL;
     printf("RIMOZIONE DI UN ELEMENTO DALL'EQUIPAGGIAMENTO\n");
-    if (personaggio->equip->using == 0) {
+    if (pgnode->val.equip->using == 0) {
         printf("L'equipaggiamento non contiene alcun oggetto.\n");
-        return personaggio;
+        return &(pgnode->val);
     }
     printf("Inserisci il nome dell'oggetto che vuoi rimuovere dall'equipaggiamento: ");
     scanf("%s", objname); getchar();
     int found = 0;  // Aggiunto per tracciare se l'oggetto è stato trovato
-    for (int i = 0; i < personaggio->equip->using; i++) {
-        if (strncmp(strtolower(personaggio->equip->vettEq[i]->name), strtolower(objname), strlen(objname)) == 0) {
+    for (int i = 0; i < pgnode->val.equip->using; i++) {
+        if (strncmp(strtolower(pgnode->val.equip->vettEq[i]->name), strtolower(objname), strlen(objname)) == 0) {
             // Rimuovi l'oggetto solo se è stato trovato
             found = 1;
-            personaggio->equip->using--;
+            pgnode->val.equip->using--;
 
             // Sposta l'ultimo oggetto nell'equipaggiamento nella posizione dell'oggetto rimosso
-            personaggio->equip->vettEq[i] = personaggio->equip->vettEq[personaggio->equip->using];
-            personaggio->equip->vettEq[personaggio->equip->using] = NULL;
+            pgnode->val.equip->vettEq[i] = pgnode->val.equip->vettEq[pgnode->val.equip->using];
+            pgnode->val.equip->vettEq[pgnode->val.equip->using] = NULL;
 
             printf("%s rimosso con successo.\n", objname);
             break;  // Esci dal ciclo una volta che l'oggetto è stato rimosso
@@ -116,7 +122,7 @@ PG *removeObj(PG *personaggio) {
         printf("Oggetto non trovato nell'equipaggiamento.\n");
     }
 
-    return personaggio;
+    return &(pgnode->val);
 }
 
 
@@ -153,7 +159,6 @@ void printPG(PG personaggio){
         for(int i=0; i<personaggio.equip->using; i++){
             printf("|- %s\n", personaggio.equip->vettEq[i]->name);
         }
-        printf("!!!!!!!!!! OK");
     }
     printf("----------------\n");
 }
@@ -170,7 +175,9 @@ void printList(link h){
 tabPG *insPG(tabPG *tabPers){
     PG personaggio;
     personaggio.equip = malloc(sizeof(eq));
-    personaggio.equip->using = 0; personaggio.equip->vettEq = NULL;
+    personaggio.equip->vettEq = malloc(8*sizeof(obj*));
+    personaggio.equip->using = 0; 
+    // personaggio.equip->vettEq = NULL;
     printf("Inserimento di un personaggio\nInserici il codice di 6 cifre del tipo PGXXXX da associare al personaggio: ");
     scanf("%s", personaggio.code); getchar();
     printf("Inserisci il nome da associare al personaggio: "); 
@@ -226,13 +233,17 @@ tabPG *loadPGs(char *filename){
     tabPG *tabPers=malloc(sizeof(tabPG));
     tabPers->nPG = 0;
     tabPers->headPG = NULL; tabPers->tailPG = NULL;
-
+    if(fp_read==NULL){
+        printf("Errore durante l'apertura del file '%s'.", filename);
+        return NULL;
+    }
     while(!feof(fp_read)){
         fscanf(fp_read, "%s %s %s %d %d %d %d %d %d", 
         personaggio.code, personaggio.name, personaggio.class, 
         &(personaggio.stats.hp), &(personaggio.stats.mp),&(personaggio.stats.atk),
         &(personaggio.stats.def), &(personaggio.stats.mag), &(personaggio.stats.spr));
         personaggio.equip = malloc(sizeof(eq));
+        personaggio.equip->vettEq = malloc(8*sizeof(obj*));
         personaggio.equip->using = 0;
         // Devo inserire in coda il nodo che contiene la struct di tipo PG! 
         listInsCoda(&(tabPers->headPG), &(tabPers->tailPG), personaggio);
